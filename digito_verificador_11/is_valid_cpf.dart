@@ -1,26 +1,6 @@
-// Importing the dart:io library for standard input/output operations.
 import 'dart:io';
 
-/// Validates a Brazilian CPF number.
-/// 
-/// This function takes a CPF number as a string, validates it, and returns a boolean.
-/// The CPF number can include dots and dashes as separators.
-///
-/// Example:
-/// ```dart
-/// print(isValidCPF('39053344705'));  // Returns true
-/// print(isValidCPF('390.533.447-05'));  // Also returns true
-/// ```
 bool isValidCPF(String cpf) {
-  // Remove any non-numeric characters like dots and dashes
-  cpf = cpf.replaceAll(RegExp(r'\D'), '');
-
-  // Check for correct length and not all equal digits
-  // CPF must be 11 digits long and not have all digits the same
-  if (cpf.length != 11 || RegExp(r'(\d)\1{10}').hasMatch(cpf)) {
-    return false;
-  }
-
   // Helper function to calculate individual verification digits
   int calcDigit(String slice, List<int> weights) {
     int sum = 0;
@@ -43,23 +23,35 @@ bool isValidCPF(String cpf) {
   final digit1 = calcDigit(slice1, weights1);
   final digit2 = calcDigit(slice2, weights2);
 
-  // Check if the calculated digits match the ones in the CPF number
   return '$digit1$digit2' == cpf.substring(9);
 }
 
-// Main function to get user input and validate the CPF number
 void main() {
   print('Por favor, digite o CPF para validação:');
   String? cpfInput = stdin.readLineSync();
 
-  if (cpfInput != null) {
-    bool isValid = isValidCPF(cpfInput);
-    if (isValid) {
-      print('O CPF é válido.');
-    } else {
-      print('O CPF é inválido.');
-    }
-  } else {
+  if (cpfInput == null) {
     print('Nenhum CPF foi digitado.');
+    return;
+  }
+
+  // Check if input contains only numbers, dots, and dashes
+  if (!RegExp(r'^[\d\.-]+$').hasMatch(cpfInput)) {
+    print('O CPF deve conter apenas dígitos, pontos e traços.');
+    return;
+  }
+
+  // Remove non-numeric characters
+  String cleanedInput = cpfInput.replaceAll(RegExp(r'\D'), '');
+
+  print('CPF após remoção de caracteres não numéricos: $cleanedInput');
+
+  if (cleanedInput.length != 11) {
+    print('O CPF deve ter exatamente 11 dígitos.');
+  } else if (cleanedInput.split('').toSet().length == 1) {
+    print('O CPF não pode ter todos os dígitos iguais.');
+  } else {
+    bool isValid = isValidCPF(cleanedInput);
+    print(isValid ? 'O CPF é válido.' : 'O CPF é inválido.');
   }
 }
