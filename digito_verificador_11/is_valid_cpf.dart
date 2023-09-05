@@ -1,15 +1,20 @@
 import 'dart:io';
 
 bool isValidCPF(String cpf) {
-  // Helper function to calculate individual verification digits
+
+  //Função otimizada
   int calcDigit(String slice, List<int> weights) {
-    int sum = 0;
-    for (int i = 0; i < slice.length; i++) {
-      sum += int.parse(slice[i]) * weights[i];
-    }
+    final sum = slice
+        .split('')
+        .asMap()
+        .map((i, digit) => MapEntry(i, int.parse(digit) * weights[i]))
+        .values
+        .reduce((a, b) => a + b);
+
     final int mod = sum % 11;
     return (mod < 2) ? 0 : 11 - mod;
   }
+
 
   // Weights for the first and second verification digits
   final weights1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
