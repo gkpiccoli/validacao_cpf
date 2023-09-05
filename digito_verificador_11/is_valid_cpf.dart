@@ -1,9 +1,11 @@
+// Importando Dart I/O para stdin e stdout
 import 'dart:io';
 
+// Função para validar um CPF brasileiro
 bool isValidCPF(String cpf) {
-
-  //Função otimizada
+  // Função auxiliar para calcular o dígito verificador
   int calcDigit(String slice, List<int> weights) {
+    // Calcular a soma dos dígitos ponderados
     final sum = slice
         .split('')
         .asMap()
@@ -11,52 +13,67 @@ bool isValidCPF(String cpf) {
         .values
         .reduce((a, b) => a + b);
 
+    // Calcular o módulo e o dígito verificador
     final int mod = sum % 11;
     return (mod < 2) ? 0 : 11 - mod;
   }
 
-
-  // Weights for the first and second verification digits
+  // Pesos para os primeiros e segundos dígitos de verificação
   final weights1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
   final weights2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
 
-  // Slices of the CPF number for calculating the verification digits
+  // Partes do CPF para calcular os dígitos de verificação
   final slice1 = cpf.substring(0, 9);
   final slice2 = cpf.substring(0, 10);
 
-  // Calculate the verification digits
+  // Calcular os dígitos de verificação
   final digit1 = calcDigit(slice1, weights1);
   final digit2 = calcDigit(slice2, weights2);
 
+  // Validar o CPF
   return '$digit1$digit2' == cpf.substring(9);
+}
+
+// Função para limpar e validar a entrada do CPF
+String? cleanAndValidateInput(String? cpfInput) {
+  if (cpfInput == null || cpfInput.trim().isEmpty) {
+    return null;
+  }
+  if (!RegExp(r'^[\d\.-]+$').hasMatch(cpfInput)) {
+    return null;
+  }
+  return cpfInput.replaceAll(RegExp(r'\D'), '');
+}
+
+// Função para validar o CPF limpo
+bool validateCleanedCPF(String cleanedInput) {
+  if (cleanedInput.length != 11 || cleanedInput.split('').toSet().length == 1) {
+    return false;
+  }
+  return true;
 }
 
 void main() {
   print('Por favor, digite o CPF para validação:');
   String? cpfInput = stdin.readLineSync();
 
-  if (cpfInput == null) {
-    print('Nenhum CPF foi digitado.');
+  String? cleanedInput = cleanAndValidateInput(cpfInput);
+
+  if (cleanedInput == null) {
+    print('Erro: Entrada inválida. Tente novamente.');
     return;
   }
 
-  // Check if input contains only numbers, dots, and dashes
-  if (!RegExp(r'^[\d\.-]+$').hasMatch(cpfInput)) {
-    print('O CPF deve conter apenas dígitos, pontos e traços.');
+  if (!validateCleanedCPF(cleanedInput)) {
+    print('Erro: CPF inválido. Tente novamente.');
     return;
   }
 
-  // Remove non-numeric characters
-  String cleanedInput = cpfInput.replaceAll(RegExp(r'\D'), '');
-
-  print('CPF após remoção de caracteres não numéricos: $cleanedInput');
-
-  if (cleanedInput.length != 11) {
-    print('O CPF deve ter exatamente 11 dígitos.');
-  } else if (cleanedInput.split('').toSet().length == 1) {
-    print('O CPF não pode ter todos os dígitos iguais.');
-  } else {
-    bool isValid = isValidCPF(cleanedInput);
-    print(isValid ? 'O CPF é válido.' : 'O CPF é inválido.');
-  }
+  bool isValid = isValidCPF(cleanedInput);
+  print('CPF digitado: $cpfInput');
+  print('CPF limpo: $cleanedInput');
+  // Supondo que a função isValidCPF esteja definida em outro lugar
+  print(isValid
+      ? 'Sucesso: O CPF é válido.'
+      : 'Erro: O CPF é inválido. Tente novamente.');
 }
