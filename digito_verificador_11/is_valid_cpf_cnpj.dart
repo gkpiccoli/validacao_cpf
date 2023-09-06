@@ -2,6 +2,14 @@
 // Importing necessary Dart libraries
 import 'dart:io';
 
+// Main function for testing
+void main() {
+  print("Enter a CPF or CNPJ:");
+  String input = stdin.readLineSync()!;
+  
+  isValidCPForCNPJ(input);
+}
+
 // Function to apply mask to CPF
 String applyMaskToCPF(String cpf) {
   return cpf.substring(0, 3) + '.' + cpf.substring(3, 6) + '.' + cpf.substring(6, 9) + '-' + cpf.substring(9);
@@ -29,16 +37,16 @@ bool isValidCPF(String cpf) {
   }
 
   // Pesos para os primeiros e segundos dígitos de verificação
-  final weights1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
-  final weights2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+  final List<int>weights1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
+  final List<int>weights2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
 
   // Partes do CPF para calcular os dígitos de verificação
-  final slice1 = cpf.substring(0, 9);
-  final slice2 = cpf.substring(0, 10);
+  final String slice1 = cpf.substring(0, 9);
+  final String slice2 = cpf.substring(0, 10);
 
   // Calcular os dígitos de verificação
-  final digit1 = calcDigit(slice1, weights1);
-  final digit2 = calcDigit(slice2, weights2);
+  final int digit1 = calcDigit(slice1, weights1);
+  final int  digit2 = calcDigit(slice2, weights2);
 
   // Validar o CPF
   return '$digit1$digit2' == cpf.substring(9);
@@ -99,10 +107,3 @@ bool isValidCPForCNPJ(String input) {
   return false;
 }
 
-// Main function for testing
-void main() {
-  print("Enter a CPF or CNPJ:");
-  String input = stdin.readLineSync()!;
-  
-  isValidCPForCNPJ(input);
-}
