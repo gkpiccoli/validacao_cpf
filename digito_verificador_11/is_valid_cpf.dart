@@ -1,3 +1,4 @@
+//TODO: implantar 00000000 11111111 222222 33333...
 // Importando Dart I/O para stdin e stdout
 import 'dart:io';
 
